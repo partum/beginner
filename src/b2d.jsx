@@ -32,7 +32,7 @@ function B2D() {
     setDecimal(dec);
   }
 
-  return <>
+  return < div className="project">
     <h2>Binary to Decimal Converter</h2>
     <form onSubmit={handleSubmit}>
       <input 
@@ -44,7 +44,7 @@ function B2D() {
       <button type="submit">Convert</button>
     </form>
     <p>Decimal: {decimal}</p>
-  </>
+  </div>
 }
 
 export default B2D

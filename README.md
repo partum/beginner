@@ -9,11 +9,14 @@ This is a demonstration of several beginner projects from [this repo](https://gi
 1. Binary to Decimal converter [brief](https://github.com/florinpop17/app-ideas/blob/master/Projects/1-Beginner/Bin2Dec-App.md)
 2. Countdown timer [brief](https://github.com/florinpop17/app-ideas/blob/master/Projects/1-Beginner/Countdown-Timer-App.md)
 ## The Process 🌶️
--
+I created each project one at a time, adjusting the layout as I went. 
 ## What I Learned 🪅
 For the first project I had to review how to convert between decimal and binary and how to do regex.
+For the second project I learned how to use local storage.
 ## What Could Be Improved 💃
 I think the first project it good but the next logical step would be to convert from decimal to binary.
+For the second project I could have added a button to clear the values entered.
 ## Demonstration 🌯
-Insert a video of the project in action or at least some screen shots 𐂃
+Screenshots 𐂃
+![This is what the website looks like right now](Screenshot 2025-12-04 at 13-59-13 beginner projects.png)
 

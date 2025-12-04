@@ -5,10 +5,10 @@ import Count from './count'
 function App() {
 
   return (
-    <>
+    <div className='container'>
       <B2D />
       <Count/>
-    </>
+    </div>
   )
 }
 

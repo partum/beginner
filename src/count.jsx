@@ -1,8 +1,22 @@
 import React, { useState, useEffect } from 'react';
 function Count() {
-  const [name, setName] = useState("");
-  const [date, setDate] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [name, setName] = useState(() => {
+  // getting stored value
+  const saved = localStorage.getItem("name");
+  return saved || "";
+});
+  const [date, setDate] = useState(() => {
+  // getting stored value
+  const savedD = localStorage.getItem("date");
+  const initialValue = JSON.parse(savedD);
+  return initialValue || "";
+});
+  const [submitted, setSubmitted] = useState(() => {
+  // getting stored value
+  const savedS = localStorage.getItem("submitted");
+  const initialValueS = JSON.parse(savedS);
+  return initialValueS || false;
+});
   const [days, setDays] = useState(0);
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
@@ -45,6 +59,13 @@ function Count() {
       clearInterval(interval);
     };
   });
+
+  useEffect(() => {
+  // storing input name
+  localStorage.setItem("name", name);
+  localStorage.setItem("date",  JSON.stringify(date));
+  localStorage.setItem("submitted",  JSON.stringify(submitted));
+}, [name, date, submitted]);
 
   return < div className="project">
     <h2>Countdown Timer</h2>

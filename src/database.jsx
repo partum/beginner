@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useRef } from 'react';
 class Customer {
   constructor(customerDB) {
     this.customerDB = customerDB;
@@ -67,7 +68,7 @@ class Customer {
       objectStore.createIndex('number', 'number', { unique: true });
 
       // Populate the database with the initial set of rows
-      customerData.forEach(function(customer) {
+      customerData.forEach(function (customer) {
         objectStore.put(customer);
       });
       db.close();
@@ -90,8 +91,9 @@ const clearDB = () => {
 /**
  * Add customer data to the database
  */
-const loadDB = () => {
+const loadDB = (setStatus) => {
   console.log('Load the Customers database');
+  setStatus('Loading database...');
 
   // Customers to add to initially populate the database with
   const customerData = [
@@ -100,20 +102,49 @@ const loadDB = () => {
   ];
   let customer = new Customer(customerDB);
   customer.initialLoad(customerData);
+  setStatus('Database loaded');
 }
 //list all entries in the database
 const queryDB = () => {
+  const request = indexedDB.open('customer_db', 1);
 
+  request.onerror = (event) => {
+    console.error('queryDB - Database error: ', event.target.error.code,
+      " - ", event.target.error.message);
+  };
+
+  request.onsuccess = (event) => {
+    const db = event.target.result;
+    const txn = db.transaction('customers', 'readonly');
+    txn.onerror = (event) => {
+      console.error('queryDB - Transaction error: ', event.target.error.code,
+        " - ", event.target.error.message);
+    };
+    const objectStore = txn.objectStore('customers');
+    const getAllRequest = objectStore.getAll();
+    getAllRequest.onsuccess = () => {
+      const customers = getAllRequest.result;
+      console.log('Got all customers');
+      console.table(customers);
+    };
+    getAllRequest.onerror = (err) => {
+      console.error(`Error to get all customers: ${err}`);
+    };
+  };
 }
 
+
+
 function Database() {
-    
-return < div className="project">
-<h2>Customer Database</h2>
-<span id="ErrorOutput"></span>
-<button onClick={loadDB}>Load</button>
-<button onClick={queryDB}>Query</button>
-<button onClick={clearDB}>Clear</button>
-</div>
+
+  const [status, setStatus] = useState('Started');
+
+  return < div className="project">
+    <h2>Customer Database</h2>
+    <span id="ErrorOutput">{status}</span>
+    <button onClick={() => loadDB(setStatus)}>Load</button>
+    <button onClick={queryDB}>Query</button>
+    <button onClick={clearDB}>Clear</button>
+  </div>
 }
 export default Database;

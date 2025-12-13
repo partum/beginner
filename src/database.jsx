@@ -82,8 +82,8 @@ const customerDB = 'customer_db';
 /**
  * Clear all customer data from the database
  */
-const clearDB = () => {
-  console.log('Delete all rows from the Customers database');
+const clearDB = (setStatus) => {
+  setStatus('Delete all rows from the Customers database');
   let customer = new Customer(customerDB);
   customer.removeAllRows();
 }
@@ -105,7 +105,7 @@ const loadDB = (setStatus) => {
   setStatus('Database loaded');
 }
 //list all entries in the database
-const queryDB = () => {
+const queryDB = (setStatus) => {
   const request = indexedDB.open('customer_db', 1);
 
   request.onerror = (event) => {
@@ -114,6 +114,7 @@ const queryDB = () => {
   };
 
   request.onsuccess = (event) => {
+    setStatus('Querying database...');
     const db = event.target.result;
     const txn = db.transaction('customers', 'readonly');
     txn.onerror = (event) => {
@@ -124,7 +125,7 @@ const queryDB = () => {
     const getAllRequest = objectStore.getAll();
     getAllRequest.onsuccess = () => {
       const customers = getAllRequest.result;
-      console.log('Got all customers');
+      setStatus('Got all customers');
       console.table(customers);
     };
     getAllRequest.onerror = (err) => {
@@ -143,8 +144,8 @@ function Database() {
     <h2>Customer Database</h2>
     <span id="ErrorOutput">{status}</span>
     <button onClick={() => loadDB(setStatus)}>Load</button>
-    <button onClick={queryDB}>Query</button>
-    <button onClick={clearDB}>Clear</button>
+    <button onClick={() => queryDB(setStatus)}>Query</button>
+    <button onClick={() => clearDB(setStatus)}>Clear</button>
   </div>
 }
 export default Database;

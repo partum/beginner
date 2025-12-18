@@ -117,3 +117,8 @@ button {
   gap: 20px;
   align-items: center;
 }
+
+#ErrorOutput{
+  overflow: scroll;
+  max-height: 100px;
+}

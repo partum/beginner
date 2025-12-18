@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, { useState } from 'react';
 class Customer {
   constructor(customerDB) {
     this.customerDB = customerDB;
@@ -20,14 +20,18 @@ class Customer {
     };
 
     request.onsuccess = (event) => {
-      addToLog('Deleting all customers...');
       const db = event.target.result;
+      if (!db.objectStoreNames.contains('customers')) {
+        addToLog('Database not initialized. Please click Load first.');
+        return;
+      }
+      addToLog('Deleting all customers...');
       const txn = db.transaction('customers', 'readwrite');
       txn.onerror = (event) => {
         addToLog('removeAllRows - Txn error: ', event.target.error.code,
           " - ", event.target.error.message);
       };
-      txn.oncomplete = (addToLog) => {
+      txn.oncomplete = () => {
         addToLog('All rows removed!');
       };
       const objectStore = txn.objectStore('customers');
@@ -46,8 +50,7 @@ class Customer {
    * @memberof Customer
    */
   initialLoad = (customerData, addToLog) => {
-    const request = indexedDB.open(this.customerDB, 1);
-
+    const request = indexedDB.open(this.customerDB, 1); 
     request.onerror = (event) => {
       addToLog('initialLoad - Database error: ', event.target.error.code,
         " - ", event.target.error.message);
@@ -69,10 +72,12 @@ class Customer {
 
       // Populate the database with the initial set of rows
       customerData.forEach(function (customer) {
-        objectStore.put(customer);
+        objectStore.put(customer); //this is not being called for some reason
+        console.log('Customer added:', customer);
       });
-      db.close();
+      //db.close();
     };
+    console.log('initialLoad was called');
   }
 }
 
@@ -104,7 +109,7 @@ const loadDB = (addToLog) => {
   addToLog('Database loaded');
 }
 //list all entries in the database
-const queryDB = (addToLog) => {
+const queryDB = (addToLog, setOutput) => {
   const request = indexedDB.open('customer_db', 1);
 
   request.onerror = (event) => {
@@ -113,8 +118,12 @@ const queryDB = (addToLog) => {
   };
 
   request.onsuccess = (event) => {
-    addToLog('Querying database...');
     const db = event.target.result;
+    if (!db.objectStoreNames.contains('customers')) {
+      addToLog('Database not initialized. Please click Load first.');
+      return;
+    }
+    addToLog('Querying database...');
     const txn = db.transaction('customers', 'readonly');
     txn.onerror = (event) => {
       console.error('queryDB - Transaction error: ', event.target.error.code,
@@ -126,6 +135,7 @@ const queryDB = (addToLog) => {
       const customers = getAllRequest.result;
       addToLog('Got all customers');
       console.table(customers);
+      setOutput(customers);
     };
     getAllRequest.onerror = (err) => {
       console.error(`Error to get all customers: ${err}`);
@@ -138,21 +148,35 @@ const queryDB = (addToLog) => {
 function Database() {
 
   const [status, setStatus] = useState(['Started']);
+  const [output, setOutput] = useState('');
 
   const addToLog = (message) => {
     setStatus(prevStatus => [...prevStatus, message]);
   }
 
-  return < div className="project">
+  return (< div className="project">
     <h2>Customer Database</h2>
     <div id="ErrorOutput">
       {status.map((msg, index) => (
-    <div key={index}>{msg}</div>
-  ))}
+        <div key={index}>{msg}</div>
+      ))}
     </div>
     <button onClick={() => loadDB(addToLog)}>Load</button>
-    <button onClick={() => queryDB(addToLog)}>Query</button>
+    <button onClick={() => queryDB(addToLog, setOutput)}>Query</button>
     <button onClick={() => clearDB(addToLog)}>Clear</button>
+    <div>
+      <h3>Customer List:</h3>
+      {output.length > 0 ? (
+        output.map((customer, index) => (
+          <div key={index}>
+            {customer.fname} {customer.lname} - {customer.number}
+          </div>
+        ))
+      ) : (
+        <div>No customers found.</div>
+      )}
+    </div>
   </div>
+  )
 }
 export default Database;
